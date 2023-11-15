@@ -8,7 +8,7 @@ router.get("/listar", (req, res) => {
     const jsonData = JSON.parse(data);
     const arrayTask = [];
     if (Object.keys(req.query).length === 1) {
-      if (req.query.isCompleted===true) {
+      if (req.query.isCompleted=="true") {
           jsonData.forEach((element) => {
             if(element.isCompleted===true){
               arrayTask.push(element);
