@@ -1,28 +1,17 @@
-
 [
-    {
-        "id":"1",
-        "isCompleted":false,
-        "description":"Walk the dog"
-    },
-    {
-        "id":"2",
-        "isCompleted":false,
-        "description":"Hacer el proyecto integrador"
-    },
-    {
-        "id":"3",
-        "isCompleted":false,
-        "description":"Entregar el Sprint anterior"
-    },
-    {
-        "id":"4",
-        "isCompleted":true,
-        "description":"Crear tu portafolio"
-    },
-    {
-        "id":"5",
-        "isCompleted":true,
-        "description":"Bañar el perro"
-    }
+  {
+    "id": "4",
+    "isCompleted": true,
+    "description": "Crear tu portafolio"
+  },
+  {
+    "id": "5",
+    "isCompleted": true,
+    "description": "Bañar el perro"
+  },
+  {
+    "id": "6",
+    "isCompleted": false,
+    "description": "Leer el diario de ana frank"
+  }
 ]
