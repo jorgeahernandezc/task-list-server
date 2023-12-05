@@ -1,7 +1,7 @@
 const fs= require("fs");
 const express = require("express");
 const router = express.Router();
-
+const jwt = require ("jsonwebtoken");
 
 
 const verifyBody = (req, res, next) => {
@@ -21,8 +21,26 @@ const verifyBody = (req, res, next) => {
   next();
 };
 
+
+const auth = (req, res, next) => {
+const token = req.headers.authorization;
+if (!token) {
+  return res.status(401).send("No se ha encontrado el token");	
+}else{
+  jwt.verify(token, process.env.SECRET_KEY, (err, decoded) => {
+    if (err) {
+      return res.status(403).send("El token es invalido");
+    } else {
+      req.user = decoded;
+      next();
+    }
+  });
+}
+
+};
+
 router.use(express.json());
-router.use(verifyBody);
+router.use(auth,verifyBody);
 
 router.post("/crearTarea", (req, res) => {
   try {
