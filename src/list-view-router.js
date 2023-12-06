@@ -1,17 +1,7 @@
-const fs = require("fs");
 const express = require("express");
 const router = express.Router();
-
-const veerifyParams = (req, res, next) => {
-  const id = req.params.id;
-
-  if (isNaN(parseInt(id))) {
-    return res.status(400).json( 'El parámetro id debe ser un número.' );
-  }
-
-  next(); 
-};
-
+const fs = require("fs");
+const {verifyParams} = require("./middlewares/verify-request.js");
 
 router.get("/listar", (req, res) => {
   try {
@@ -23,30 +13,27 @@ router.get("/listar", (req, res) => {
           jsonData.forEach((element) => {
             if(element.isCompleted===true){
               arrayTask.push(element);
-              console.log(element)
             }
         });
-        res.send(arrayTask);
+        res.status(200).json(arrayTask);
         }else{
           jsonData.forEach((element) => {
             if(element.isCompleted===false){
               arrayTask.push(element);
             }
           });
-          res.send(arrayTask);
+          res.status(200).json(arrayTask);
       }
     } else {
-      res.send(JSON.parse(data));
+      res.status(200).json(JSON.parse(data));
     }
   } catch (error) {
-    console.error("Error al leer el archivo:", error.message);
-    res.sendStatus(500);
+    res.status(500).json({ mensaje: error.message});
   }
 });
 
-router.get("/tarea/:id",veerifyParams,(req, res) => {
+router.get("/tarea/:id",verifyParams,(req, res) => {
   const id = req.params.id;
-  console.log(id)
   try {
     const data = fs.readFileSync("./src/listaTareas.json");
     const jsonData = JSON.parse(data);
@@ -62,14 +49,13 @@ router.get("/tarea/:id",veerifyParams,(req, res) => {
     });
 
     if (tareaEncontrada) {
-      res.send(tarea);
+      res.status(200).json(tarea);
     } else {
-      res.send("Tarea no encontrada");
+      res.status(404).json({mensaje:"Tarea no encontrada"});
     }
 
   } catch (error) {
-    console.error("Error al leer el archivo:", error.message);
-    res.sendStatus(500);
+    res.status(500).json({ mensaje: error.message});
   }
 });
 

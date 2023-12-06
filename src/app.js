@@ -9,20 +9,8 @@ const listEditRouter = require("./list-edit-router");
 const PORT = process.env.PORT || 3000;
 const jwt = require("jsonwebtoken");
 const users = require("./users.json");
+const {typeMethod} = require("./middlewares/verify-request.js");
 
-const typeMethod = (req, res, next) => {
-  metodo = req.method;
-  if (
-    metodo === "GET" ||
-    metodo === "POST" ||
-    metodo === "PUT" ||
-    metodo === "DELETE"
-  ) {
-    next();
-  } else {
-    return res.status(400).send("El metodo de la solicitud http no es valido");
-  }
-};
 
 app.use(typeMethod);
 app.use(express.json());
@@ -40,11 +28,11 @@ app.post("/login", (req, res) => {
         username: username,
         email: email,
       },
-      process.env.SECRET_KEY
+      process.env.SECRET_KEY,{expiresIn: "1d"}
     );
     res.status(200).json({ token: token });
   } else {
-    res.status(401).send("Usuario o contraseña incorrecta");
+    res.status(401).json({mensaje:"Usuario o contraseña incorrecta"});
   }
 });
 

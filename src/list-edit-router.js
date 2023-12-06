@@ -2,42 +2,10 @@ const fs= require("fs");
 const express = require("express");
 const router = express.Router();
 const jwt = require ("jsonwebtoken");
+const {verifyBody} = require("./middlewares/verify-request.js");
+const {auth} = require("./middlewares/auth.js");
 
 
-const verifyBody = (req, res, next) => {
-  if ((req.method === "POST") || (req.method === "PUT")) {
-    if (Object.keys(req.body).length === 0) {
-      return res.status(400).send("La solicitud está vacía");
-    }else if(Object.keys(req.body).length!=3){
-      return res.status(400).send("Falta un argumento en la solicitud");
-    }else if(typeof req.body.id != "number"){
-      return res.status(400).send("El argumento de id es invalido");
-    }else if(typeof req.body.isCompleted != "boolean"){
-      return res.status(400).send("El argumento de isCompleted es invalido");
-    }else if(typeof req.body.description != "string"){
-      return res.status(400).send("El argumento de description es invalido");
-    }
-  }
-  next();
-};
-
-
-const auth = (req, res, next) => {
-const token = req.headers.authorization;
-if (!token) {
-  return res.status(401).send("No se ha encontrado el token");	
-}else{
-  jwt.verify(token, process.env.SECRET_KEY, (err, decoded) => {
-    if (err) {
-      return res.status(403).send("El token es invalido");
-    } else {
-      req.user = decoded;
-      next();
-    }
-  });
-}
-
-};
 
 router.use(express.json());
 router.use(auth,verifyBody);
@@ -47,10 +15,9 @@ router.post("/crearTarea", (req, res) => {
     const data = JSON.parse(fs.readFileSync('./src/listaTareas.json'));
     data.push(req.body);
     fs.writeFileSync('./src/listaTareas.json', JSON.stringify(data, null, 2));
-    res.status(200).send("Tarea ingresada con éxito");
+    res.status(200).json({mensaje:"Tarea ingresada con éxito"});
   } catch (error) {
-    console.error('Error al leer el archivo:', error.message);
-    res.sendStatus(500);
+    res.status(500).json({mensaje: error.message});
   }
 });
 
@@ -63,11 +30,10 @@ router.delete("/eliminarTarea/:id",(req,res)=>{
 if( indiceABorrar !== -1){
     data.splice(indiceABorrar,1);
     fs.writeFileSync('./src/listaTareas.json', JSON.stringify(data, null, 2));
-    res.status(200).send("Tarea borrada con exito")
+    res.status(200).json({mensaje:"Tarea borrada con exito"})
 }       
       } catch (error) {
-        console.error('Error al leer el archivo:', error.message);
-        res.sendStatus(500);
+        res.status(500).json({mensaje: error.message});
       }
 });
 
@@ -82,16 +48,16 @@ router.put("/editarTarea",(req,res)=>{
             elementoAModificar.description = req.body.description;
             try {
                 fs.writeFileSync('./src/listaTareas.json', JSON.stringify(data, null, 2));
-                res.status(200).send('Archivo actualizado con éxito.');
+                res.status(200).json({mensaje:'Archivo actualizado con éxito.'});
               } catch (error) {
-                res.status(400).send('Error al escribir en el archivo:', error.message);
+                res.status(400).json({mensaje: error.message});
               };
           } else {
-            res.status(400).send('Elemento no encontrado para modificar.');
+            res.status(400).json({mensaje:'Elemento no encontrado para modificar.'});
           }
         }
       catch (error) {
-        res.status(500).send('Error al leer el archivo:', error.message);
+        res.status(500).json({mensaje: error.message});
       }
 });
 
